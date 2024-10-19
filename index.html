@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta name="google-site-verification" content="JcdhY_GRp3irSIK7it6OfQmPAHqduKIjVUsGk-GqSu4" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta description="Gebruik deze hypotheekcalculator om uw maandelijkse hypotheeklasten te berekenen, een aflossingsschema te bekijken en meerdere extra aflossingen te simuleren. Geschikt voor hypotheekaflossing en renteberekeningen.">
+    <meta name="keywords" content="Hypotheekcalculator, Maandelijkse Hypotheeklasten, Extra Aflossing, Annuïteitenhypotheek, Lineaire hypotheek, Aflossingsschema, Hypotheekrente, Woningfinanciering, Hypotheekaflossing, Maandelijkse hypotheeklasten berekenen, Hypotheek berekenen Nederland, Annuïteitenhypotheek berekenen, Lineaire hypotheek berekenen, Hypotheek aflossingsschema, Hypotheek extra aflossen">
+    <meta name="robots" content="index, follow">
+    <title>Nederlandse Hypotheekcalculator: Annuïteit & Lineair met Extra Aflossing</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-8xwoPjZVYZf03bYc27qGPw/aw0BmHBZOlt9aHJkXBjpYprlB8q5lKAh2kxZxP3aH" crossorigin="anonymous">
+
+    <style>
+        /* General Styles */
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 800px;
+        }
+        h1, h2, h3 {
+            color: #343a40;
+        }
+        .card {
+            margin-top: 20px;
+        }
+        .btn-primary {
+            width: 100%;
+        }
+        .form-control:invalid {
+            border-color: #dc3545;
+        }
+        .form-control:invalid:focus {
+            box-shadow: none;
+        }
+        .tooltip-inner {
+            max-width: 200px;
+            text-align: left;
+        }
+        /* Language Selector Styles */
+        .language-selector {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+        }
+        /* Arrow Styles */
+        .arrow {
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        .arrow-down {
+            transform: rotate(0deg);
+        }
+        .arrow-up {
+            transform: rotate(90deg);
+        }
+        /* Remove Prepayment Button */
+        .remove-prepayment {
+            margin-top: 4px;
+            padding: 6px 12px;
+        }
+        /* Summary Section */
+        .summary-card {
+            margin-top: 20px;
+        }
+        .summary-card .card-body {
+            display: flex;
+            justify-content: space-between;
+        }
+        .summary-item {
+            text-align: center;
+        }
+        .summary-item h5 {
+            margin-bottom: 0;
+        }
+        /* Footer Note */
+        .footer-note {
+            text-align: center;
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Language Selector -->
+    <div class="language-selector">
+        <select id="languageSelect" class="form-select form-select-sm" onchange="changeLanguage()" aria-label="Taal Selectie">
+            <option value="nl" selected>Nederlands</option>
+            <option value="en">English</option>
+        </select>
+    </div>
+
+    <!-- Container -->
+    <div class="container">
+        <!-- Header -->
+        <div class="text-center mt-5">
+            <h1 data-lang-key="title">Nederlandse Hypotheekcalculator: Annuïteit & Lineair</h1>
+            <p data-lang-key="description">Gebruik deze gratis calculator om uw maandelijkse hypotheeklasten te berekenen, extra aflossingsopties te verkennen en het volledige aflossingsschema van uw hypotheek te bekijken.</p>
+        </div>
+
+        <!-- Calculator Form -->
+        <div class="card">
+            <div class="card-body">
+                <form id="emiForm">
+                    <!-- Loan Details -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="loanAmount" class="form-label" data-lang-key="loanAmountLabel">Hypotheekbedrag</label>
+                            <input type="number" class="form-control" id="loanAmount" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="interestRate" class="form-label" data-lang-key="interestRateLabel">Rente (%)</label>
+                            <input type="number" class="form-control" id="interestRate" required>
+                        </div>
+                    </div>
+                    <!-- More Loan Details -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="loanTenure" class="form-label" data-lang-key="loanTenureLabel">Hypotheeklooptijd (in jaren)</label>
+                            <input type="number" class="form-control" id="loanTenure" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="startDate" class="form-label" data-lang-key="startDateLabel">Hypotheek Startdatum <i class="fas fa-info-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="MM/JJJJ"></i></label>
+                            <input type="text" class="form-control" id="startDate" placeholder="MM/JJJJ" required>
+                        </div>
+                    </div>
+                    <!-- Mortgage Type -->
+                    <div class="mb-3">
+                        <label class="form-label" data-lang-key="mortgageTypeLabel">Hypotheektype</label>
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" id="annuity" name="mortgageType" value="annuity" checked>
+                            <label for="annuity" class="form-check-label" data-lang-key="annuity">Annuïteit</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" id="linear" name="mortgageType" value="linear">
+                            <label for="linear" class="form-check-label" data-lang-key="linear">Lineair</label>
+                        </div>
+                    </div>
+                    <!-- Prepayment Section -->
+                    <div class="mb-3">
+                        <button type="button" class="btn btn-link" id="togglePrepaymentSection">
+                            <span id="prepaymentArrow" class="arrow arrow-down">▶</span>
+                            <span data-lang-key="prepayments">Extra Aflossingen (optioneel)</span>
+                        </button>
+                    </div>
+                    <div id="prepaymentSection" style="display: none;">
+                        <div id="prepaymentContainer" class="mb-3">
+                            <!-- Prepayment fields will be added here -->
+                        </div>
+                        <!-- Button to Add Another Prepayment -->
+                        <button type="button" class="btn btn-secondary mb-3" onclick="addPrepayment()" data-lang-key="addAnotherPrepayment">Voeg een extra aflossing toe</button>
+                    </div>
+                    <!-- Calculate Button -->
+                    <button type="button" class="btn btn-primary" onclick="calculateEMI()" data-lang-key="calculateMortgage">Bereken Hypotheek</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Summary Section -->
+        <div id="summarySection" class="summary-card" style="display: none;">
+            <div class="card">
+                <div class="card-body">
+                    <div class="summary-item">
+                        <h5 data-lang-key="totalInterestPaidLabel">Totale Betaalde Rente</h5>
+                        <p id="totalInterestPaid">€0.00</p>
+                    </div>
+                    <div class="summary-item">
+                        <h5 data-lang-key="totalPaymentsLabel">Totale Betalingen</h5>
+                        <p id="totalPayments">€0.00</p>
+                    </div>
+                    <div class="summary-item">
+                        <h5 data-lang-key="loanPayoffDateLabel">Hypotheek Afbetaald Op</h5>
+                        <p id="loanPayoffDate">--/----</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EMI Result -->
+        <div class="mt-4" id="emiResult">
+            <!-- EMI Result will be displayed here -->
+        </div>
+
+        <!-- Amortization Schedule -->
+        <div class="mt-4" id="amortizationSchedule">
+            <!-- Amortization Schedule will be displayed here -->
+        </div>
+
+        <!-- Footer Note -->
+        <div class="footer-note">
+            <p data-lang-key="footerNote">Let op, de berekeningen zijn ter indicatie om u een algemeen idee te geven. We raden aan om contact op te nemen met een financieel adviseur voor nauwkeurige cijfers en advies.</p>
+        </div>
+    </div>
+
+    <!-- Language Data -->
+    <script>
+        const languageData = {
+            en: {
+                headerNote: "Welcome! This calculator provides approximate EMI calculations and estimates. For detailed financial advice, we kindly recommend consulting with a professional.",
+                title: "Dutch Mortgage Calculator: Annuity & Linear",
+                description: "Use this free calculator to estimate your monthly mortgage payments, explore prepayment options, and view the full amortization schedule of your mortgage.",
+                faq: "Frequently Asked Questions",
+                whatIsEMI: "What is an EMI?",
+                whatIsEMIAnswer: "An EMI (Equated Monthly Installment) is the amount you need to pay every month toward repaying your mortgage. This amount includes both the principal and the interest components of the loan.",
+                howPrepaymentAffectsEMI: "How does prepayment affect EMI?",
+                howPrepaymentAffectsEMIAnswer: "Prepayment allows you to pay off part of the mortgage before the tenure ends, reducing either the EMI amount or the mortgage tenure.",
+                howToCalculateEMI: "How to calculate EMI for home mortgage?",
+                howToCalculateEMIAnswer: "To calculate your home loan EMI, you need to know the mortgage amount, interest rate, and tenure. Our calculator does the rest by generating an EMI and providing a complete amortization schedule.",
+                loanAmountLabel: "Mortgage Amount",
+                interestRateLabel: "Interest Rate (%)",
+                loanTenureLabel: "Mortgage Tenure (in years)",
+                startDateLabel: "Mortgage Start Date",
+                mortgageTypeLabel: "Mortgage Type",
+                annuity: "Annuity",
+                linear: "Linear",
+                prepayments: "Prepayments (optional)",
+                addAnotherPrepayment: "Add Another Prepayment",
+                calculateMortgage: "Calculate Mortgage",
+                footerNote: "Please note, the EMI calculations are provided for informational purposes to give you a general idea. We highly recommend consulting with a financial advisor for precise figures and further advice.",
+                emiResultAnnuity: "Initial Monthly EMI: {emi} (Annuity)",
+                emiResultLinear: "Initial Monthly Payment: Calculated Below (Linear)",
+                amortizationScheduleAnnuity: "Amortization Schedule (Annuity Mortgage)",
+                amortizationScheduleLinear: "Amortization Schedule (Linear Mortgage)",
+                year: "Year",
+                principalPaid: "Principal Paid",
+                interestPaid: "Interest Paid",
+                prepaymentsMade: "Prepayments",
+                totalPayment: "Total Payment",
+                remainingBalance: "Remaining Balance",
+                details: "Details",
+                month: "Month",
+                principal: "Principal",
+                interest: "Interest",
+                prepayment: "Prepayment",
+                balance: "Balance",
+                prepaymentAmountPlaceholder: "Prepayment Amount",
+                prepaymentMonthPlaceholder: "Prepayment Month (MM/YYYY)",
+                totalInterestPaidLabel: "Total Interest Paid",
+                totalPaymentsLabel: "Total Payments",
+                loanPayoffDateLabel: "Loan Paid Off On",
+                invalidLoanAmount: "Please enter a valid mortgage amount.",
+                invalidInterestRate: "Please enter a valid interest rate.",
+                invalidLoanTenure: "Please enter a valid mortgage tenure in years.",
+                invalidStartDate: "Please enter a valid start date in MM/YYYY format."
+            },
+            nl: {
+                headerNote: "Welkom! Deze calculator geeft een schatting van de maandelijkse hypotheeklasten. Voor gedetailleerd financieel advies raden we aan om contact op te nemen met een professional.",
+                title: "Nederlandse Hypotheekcalculator: Annuïteit & Lineair",
+                description: "Gebruik deze gratis calculator om uw maandelijkse hypotheeklasten te berekenen, extra aflossingsopties te verkennen en het volledige aflossingsschema van uw hypotheek te bekijken.",
+                faq: "Veelgestelde Vragen",
+                whatIsEMI: "Wat is een maandelijkse hypotheeklast?",
+                whatIsEMIAnswer: "Een maandelijkse hypotheeklast is het bedrag dat u elke maand moet betalen voor het aflossen van uw hypotheek. Dit bedrag omvat zowel de aflossing als de rente van de lening.",
+                howPrepaymentAffectsEMI: "Hoe beïnvloedt extra aflossen de maandelijkse lasten?",
+                howPrepaymentAffectsEMIAnswer: "Extra aflossen stelt u in staat om een deel van de hypotheek eerder af te lossen, waardoor u ofwel de maandelijkse lasten verlaagt of de looptijd van de hypotheek verkort.",
+                howToCalculateEMI: "Hoe bereken ik mijn maandelijkse hypotheeklasten?",
+                howToCalculateEMIAnswer: "Om uw maandelijkse hypotheeklasten te berekenen, heeft u het hypotheekbedrag, de rente en de looptijd nodig. Onze calculator doet de rest door een maandelijkse last te genereren en een volledig aflossingsschema te verstrekken.",
+                loanAmountLabel: "Hypotheekbedrag",
+                interestRateLabel: "Rente (%)",
+                loanTenureLabel: "Hypotheeklooptijd (in jaren)",
+                startDateLabel: "Hypotheek Startdatum",
+                mortgageTypeLabel: "Hypotheektype",
+                annuity: "Annuïteit",
+                linear: "Lineair",
+                prepayments: "Extra Aflossingen (optioneel)",
+                addAnotherPrepayment: "Voeg een extra aflossing toe",
+                calculateMortgage: "Bereken Hypotheek",
+                footerNote: "Let op, de berekeningen zijn ter indicatie om u een algemeen idee te geven. We raden aan om contact op te nemen met een financieel adviseur voor nauwkeurige cijfers en advies.",
+                emiResultAnnuity: "Initiële Maandelijkse Lasten: {emi} (Annuïteit)",
+                emiResultLinear: "Initiële Maandelijkse Betaling: Hieronder Berekend (Lineair)",
+                amortizationScheduleAnnuity: "Aflossingsschema (Annuïteitenhypotheek)",
+                amortizationScheduleLinear: "Aflossingsschema (Lineaire Hypotheek)",
+                year: "Jaar",
+                principalPaid: "Aflossing",
+                interestPaid: "Betaalde Rente",
+                prepaymentsMade: "Extra Aflossingen",
+                totalPayment: "Totale Betaling",
+                remainingBalance: "Resterende Schuld",
+                details: "Details",
+                month: "Maand",
+                principal: "Aflossing",
+                interest: "Rente",
+                prepayment: "Extra Aflossing",
+                balance: "Saldo",
+                prepaymentAmountPlaceholder: "Aflossingsbedrag",
+                prepaymentMonthPlaceholder: "Aflossingsmaand (MM/JJJJ)",
+                totalInterestPaidLabel: "Totale Betaalde Rente",
+                totalPaymentsLabel: "Totale Betalingen",
+                loanPayoffDateLabel: "Hypotheek Afbetaald Op",
+                invalidLoanAmount: "Vul alstublieft een geldig hypotheekbedrag in.",
+                invalidInterestRate: "Vul alstublieft een geldige rente in.",
+                invalidLoanTenure: "Vul alstublieft een geldige hypotheeklooptijd in jaren in.",
+                invalidStartDate: "Vul alstublieft een geldige startdatum in het formaat MM/JJJJ in."
+            }
+        };
+    </script>
+
+    <!-- Main Script -->
+    <script>
+        // Function to change language
+        function changeLanguage() {
+            const selectedLang = document.getElementById('languageSelect').value;
+            const elements = document.querySelectorAll('[data-lang-key]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-lang-key');
+                if (languageData[selectedLang][key]) {
+                    element.textContent = languageData[selectedLang][key];
+                }
+            });
+
+            // Update placeholders
+            const placeholders = document.querySelectorAll('input[placeholder]');
+            placeholders.forEach(input => {
+                const placeholderKey = input.getAttribute('data-placeholder-key');
+                if (placeholderKey && languageData[selectedLang][placeholderKey]) {
+                    input.placeholder = languageData[selectedLang][placeholderKey];
+                }
+            });
+        }
+
+        // Initial language setup
+        document.addEventListener('DOMContentLoaded', () => {
+            changeLanguage();
+
+            // Enable tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Toggle prepayment section visibility
+            document.getElementById('togglePrepaymentSection').addEventListener('click', function() {
+                const prepaymentSection = document.getElementById('prepaymentSection');
+                const prepaymentArrow = document.getElementById('prepaymentArrow');
+                if (prepaymentSection.style.display === 'none') {
+                    prepaymentSection.style.display = 'block';
+                    prepaymentArrow.classList.remove('arrow-down');
+                    prepaymentArrow.classList.add('arrow-up');
+                } else {
+                    prepaymentSection.style.display = 'none';
+                    prepaymentArrow.classList.remove('arrow-up');
+                    prepaymentArrow.classList.add('arrow-down');
+                }
+            });
+        });
+
+        // Function to add another prepayment row
+        function addPrepayment() {
+            const prepaymentContainer = document.getElementById('prepaymentContainer');
+            const prepaymentRow = document.createElement('div');
+            prepaymentRow.classList.add('row', 'g-2', 'mb-2', 'prepayment-row');
+
+            // Generate a unique ID for each prepayment row
+            const rowId = 'prepaymentRow-' + Date.now();
+            prepaymentRow.setAttribute('id', rowId);
+
+            const lang = document.getElementById('languageSelect').value;
+
+            prepaymentRow.innerHTML = `
+                <div class="col-5">
+                    <input type="number" class="form-control" placeholder="${languageData[lang]['prepaymentAmountPlaceholder']}" data-placeholder-key="prepaymentAmountPlaceholder" />
+                </div>
+                <div class="col-5">
+                    <input type="text" class="form-control" placeholder="${languageData[lang]['prepaymentMonthPlaceholder']}" data-placeholder-key="prepaymentMonthPlaceholder" />
+                </div>
+                <div class="col-2">
+                    <button type="button" class="btn btn-danger remove-prepayment" data-row-id="${rowId}">&times;</button>
+                </div>
+            `;
+            prepaymentContainer.appendChild(prepaymentRow);
+
+            // Attach event listener to the remove button
+            prepaymentRow.querySelector('.remove-prepayment').addEventListener('click', function() {
+                const rowId = this.getAttribute('data-row-id');
+                document.getElementById(rowId).remove();
+            });
+        }
+
+        function validateInputs() {
+            const loanAmount = parseFloat(document.getElementById('loanAmount').value);
+            const interestRate = parseFloat(document.getElementById('interestRate').value);
+            const loanTenure = parseFloat(document.getElementById('loanTenure').value);
+            const startDate = document.getElementById('startDate').value.trim();
+
+            const lang = document.getElementById('languageSelect').value;
+
+            if (isNaN(loanAmount) || loanAmount <= 0) {
+                alert(languageData[lang].invalidLoanAmount);
+                return false;
+            }
+            if (isNaN(interestRate) || interestRate <= 0) {
+                alert(languageData[lang].invalidInterestRate);
+                return false;
+            }
+            if (isNaN(loanTenure) || loanTenure <= 0) {
+                alert(languageData[lang].invalidLoanTenure);
+                return false;
+            }
+            const datePattern = /^(0[1-9]|1[0-2])\/\d{4}$/;
+            if (!datePattern.test(startDate)) {
+                alert(languageData[lang].invalidStartDate);
+                return false;
+            }
+            return true;
+        }
+
+        function calculateEMI() {
+            if (!validateInputs()) {
+                return;
+            }
+
+            const loanAmount = parseFloat(document.getElementById('loanAmount').value);
+            const interestRate = parseFloat(document.getElementById('interestRate').value);
+            const loanTenure = parseFloat(document.getElementById('loanTenure').value);
+            const startDate = document.getElementById('startDate').value.trim();
+            const mortgageType = document.querySelector('input[name="mortgageType"]:checked').value;
+
+            // Default prepayment option
+            const prepaymentOption = 'reduceEMI';
+
+            const monthlyRate = interestRate / 12 / 100;
+            const numberOfMonths = Math.round(loanTenure * 12);
+
+            const prepayments = getPrepayments(); // Collect prepayment data from the UI
+
+            const lang = document.getElementById('languageSelect').value;
+
+            if (mortgageType === "annuity") {
+                let emi = (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, numberOfMonths)) / (Math.pow(1 + monthlyRate, numberOfMonths) - 1);
+                const emiText = languageData[lang]['emiResultAnnuity'].replace('{emi}', emi.toFixed(2));
+                document.getElementById('emiResult').innerHTML = `<h4>${emiText}</h4>`;
+                generateAmortizationScheduleAnnuity(loanAmount, monthlyRate, emi, numberOfMonths, startDate, prepayments, prepaymentOption, lang);
+            } else {
+                const emiText = languageData[lang]['emiResultLinear'];
+                document.getElementById('emiResult').innerHTML = `<h4>${emiText}</h4>`;
+                generateAmortizationScheduleLinear(loanAmount, monthlyRate, numberOfMonths, startDate, prepayments, prepaymentOption, lang);
+            }
+        }
+
+        function getPrepayments() {
+            const prepaymentRows = document.querySelectorAll('#prepaymentContainer .prepayment-row');
+            const prepayments = [];
+
+            prepaymentRows.forEach(row => {
+                const amountInput = row.querySelector('input[type="number"]');
+                const monthInput = row.querySelector('input[type="text"]');
+
+                const amount = parseFloat(amountInput.value) || 0;
+                const month = monthInput.value.trim();
+
+                const datePattern = /^(0[1-9]|1[0-2])\/\d{4}$/;
+                if (amount > 0 && datePattern.test(month)) {
+                    prepayments.push({ month, amount });
+                }
+            });
+
+            return prepayments;
+        }
+
+        // Annuity Mortgage Schedule with Multiple Prepayment Simulation
+        function generateAmortizationScheduleAnnuity(loanAmount, monthlyRate, initialEmi, numberOfMonths, startDate, prepayments, prepaymentOption, lang) {
+            let balance = loanAmount;
+            let amortizationData = `<h4>${languageData[lang]['amortizationScheduleAnnuity']}</h4>
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>${languageData[lang]['year']}</th>
+                                                <th>${languageData[lang]['principalPaid']}</th>
+                                                <th>${languageData[lang]['interestPaid']}</th>
+                                                <th>${languageData[lang]['prepaymentsMade']}</th>
+                                                <th>${languageData[lang]['totalPayment']}</th>
+                                                <th>${languageData[lang]['remainingBalance']}</th>
+                                                <th>${languageData[lang]['details']}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>`;
+
+            let [startMonth, startYear] = startDate.split('/').map(Number);
+            let currentMonth = startMonth;
+            let currentYear = startYear;
+            let yearPrincipalPaid = 0;
+            let yearInterestPaid = 0;
+            let yearPrepaymentTotal = 0;
+            let yearWiseData = {};
+            let emi = initialEmi;
+            let monthCounter = 0;
+            let remainingPeriods = numberOfMonths;
+
+            let totalInterestPaid = 0;
+            let totalPayments = 0;
+            let loanPayoffDate = '';
+
+            while (balance > 0 && monthCounter < 1000) {
+                const monthYear = `${String(currentMonth).padStart(2, '0')}/${currentYear}`;
+                let prepaymentForMonth = 0;
+                let prepaymentOccurred = false;
+
+                // Check for prepayments
+                prepayments.forEach(prepayment => {
+                    if (prepayment.month === monthYear) {
+                        const applicablePrepayment = Math.min(prepayment.amount, balance);
+                        balance -= applicablePrepayment;
+                        prepaymentForMonth = applicablePrepayment;
+                        prepaymentOccurred = true;
+                        yearPrepaymentTotal += applicablePrepayment;
+
+                        if (balance <= 0) {
+                            balance = 0;
+                        } else {
+                            if (prepaymentOption === "reduceTenure") {
+                                remainingPeriods = Math.log(emi / (emi - balance * monthlyRate)) / Math.log(1 + monthlyRate);
+                                remainingPeriods = Math.ceil(remainingPeriods);
+                            } else if (prepaymentOption === "reduceEMI") {
+                                emi = (balance * monthlyRate * Math.pow(1 + monthlyRate, remainingPeriods)) / (Math.pow(1 + monthlyRate, remainingPeriods) - 1);
+                            }
+                        }
+                    }
+                });
+
+                const interestForMonth = balance * monthlyRate;
+                let principalForMonth = emi - interestForMonth;
+
+                if (balance - principalForMonth < 0) {
+                    principalForMonth = balance;
+                    emi = principalForMonth + interestForMonth;
+                }
+
+                balance -= principalForMonth;
+                yearPrincipalPaid += principalForMonth;
+                yearInterestPaid += interestForMonth;
+                totalInterestPaid += interestForMonth;
+                totalPayments += emi + prepaymentForMonth;
+
+                if (!yearWiseData[currentYear]) {
+                    yearWiseData[currentYear] = [];
+                }
+
+                // Build the row for the month
+                let monthRow = `
+                    <tr${prepaymentOccurred ? ' class="prepayment-row"' : ''}>
+                        <td>${monthYear}</td>
+                        <td>${principalForMonth.toFixed(2)}</td>
+                        <td>${interestForMonth.toFixed(2)}</td>
+                        <td>${prepaymentForMonth > 0 ? prepaymentForMonth.toFixed(2) : ''}</td>
+                        <td>${(emi + prepaymentForMonth).toFixed(2)}</td>
+                        <td>${balance.toFixed(2)}</td>
+                    </tr>
+                `;
+
+                yearWiseData[currentYear].push(monthRow);
+
+                monthCounter++;
+                remainingPeriods--;
+                currentMonth++;
+                if (currentMonth > 12) {
+                    currentMonth = 1;
+                    currentYear++;
+                }
+
+                // Save loan payoff date
+                if (balance <= 0 && !loanPayoffDate) {
+                    loanPayoffDate = `${String(currentMonth).padStart(2, '0')}/${currentYear}`;
+                }
+
+                // Add the year summary row at the end of the year or if loan is paid off
+                if (currentMonth === 1 || balance <= 0) {
+                    const yearTotalPayment = yearPrincipalPaid + yearInterestPaid + yearPrepaymentTotal;
+
+                    const displayYear = currentMonth === 1 ? currentYear - 1 : currentYear;
+
+                    amortizationData += `
+                        <tr class="toggle-year" data-year="${displayYear}">
+                            <td>${displayYear}</td>
+                            <td>${yearPrincipalPaid.toFixed(2)}</td>
+                            <td>${yearInterestPaid.toFixed(2)}</td>
+                            <td>${yearPrepaymentTotal.toFixed(2)}</td>
+                            <td>${yearTotalPayment.toFixed(2)}</td>
+                            <td>${balance.toFixed(2)}</td>
+                            <td><span class="arrow arrow-up" id="arrow-${displayYear}">▶</span></td>
+                        </tr>
+                        <tr class="collapse" id="year-${displayYear}">
+                            <td colspan="7">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>${languageData[lang]['month']}</th>
+                                            <th>${languageData[lang]['principal']}</th>
+                                            <th>${languageData[lang]['interest']}</th>
+                                            <th>${languageData[lang]['prepayment']}</th>
+                                            <th>${languageData[lang]['totalPayment']}</th>
+                                            <th>${languageData[lang]['balance']}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="monthDetails-${displayYear}">
+                                        ${yearWiseData[displayYear].join('')}
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>`;
+
+                    yearPrincipalPaid = 0;
+                    yearInterestPaid = 0;
+                    yearPrepaymentTotal = 0;
+                }
+            }
+
+            amortizationData += '</tbody></table>';
+            document.getElementById('amortizationSchedule').innerHTML = amortizationData;
+
+            // Display Summary
+            displaySummary(totalInterestPaid, totalPayments, loanPayoffDate, lang);
+
+            // Attach event listeners for collapsible rows
+            attachToggleEvents();
+        }
+
+        // Linear Mortgage Schedule with Multiple Prepayment Simulation
+        function generateAmortizationScheduleLinear(loanAmount, monthlyRate, initialNumberOfMonths, startDate, prepayments, prepaymentOption, lang) {
+            let balance = loanAmount;
+            let amortizationData = `<h4>${languageData[lang]['amortizationScheduleLinear']}</h4>
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>${languageData[lang]['year']}</th>
+                                                <th>${languageData[lang]['principalPaid']}</th>
+                                                <th>${languageData[lang]['interestPaid']}</th>
+                                                <th>${languageData[lang]['prepaymentsMade']}</th>
+                                                <th>${languageData[lang]['totalPayment']}</th>
+                                                <th>${languageData[lang]['remainingBalance']}</th>
+                                                <th>${languageData[lang]['details']}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>`;
+
+            let [startMonth, startYear] = startDate.split('/').map(Number);
+            let currentMonth = startMonth;
+            let currentYear = startYear;
+            let yearPrincipalPaid = 0;
+            let yearInterestPaid = 0;
+            let yearPrepaymentTotal = 0;
+            let yearWiseData = {};
+            let monthCounter = 0;
+            let remainingPeriods = initialNumberOfMonths;
+
+            let monthlyPrincipalPayment = loanAmount / initialNumberOfMonths;
+
+            let totalInterestPaid = 0;
+            let totalPayments = 0;
+            let loanPayoffDate = '';
+
+            while (balance > 0 && monthCounter < 1000) {
+                const monthYear = `${String(currentMonth).padStart(2, '0')}/${currentYear}`;
+                let prepaymentForMonth = 0;
+                let prepaymentOccurred = false;
+
+                // Check for prepayments
+                prepayments.forEach(prepayment => {
+                    if (prepayment.month === monthYear) {
+                        const applicablePrepayment = Math.min(prepayment.amount, balance);
+                        balance -= applicablePrepayment;
+                        prepaymentForMonth = applicablePrepayment;
+                        prepaymentOccurred = true;
+                        yearPrepaymentTotal += applicablePrepayment;
+
+                        if (balance <= 0) {
+                            balance = 0;
+                        } else {
+                            if (prepaymentOption === "reduceTenure") {
+                                // Recalculate remaining periods based on current monthly principal payment
+                                remainingPeriods = Math.ceil(balance / monthlyPrincipalPayment);
+                            } else if (prepaymentOption === "reduceEMI") {
+                                // Keep tenure the same, adjust monthly principal payment
+                                monthlyPrincipalPayment = balance / remainingPeriods;
+                            }
+                        }
+                    }
+                });
+
+                const interestForMonth = balance * monthlyRate;
+                let totalPayment = monthlyPrincipalPayment + interestForMonth + prepaymentForMonth;
+
+                if (balance - monthlyPrincipalPayment < 0) {
+                    monthlyPrincipalPayment = balance;
+                    totalPayment = monthlyPrincipalPayment + interestForMonth + prepaymentForMonth;
+                }
+
+                balance -= monthlyPrincipalPayment;
+                yearPrincipalPaid += monthlyPrincipalPayment;
+                yearInterestPaid += interestForMonth;
+                totalInterestPaid += interestForMonth;
+                totalPayments += totalPayment;
+
+                if (!yearWiseData[currentYear]) {
+                    yearWiseData[currentYear] = [];
+                }
+
+                // Build the row for the month
+                let monthRow = `
+                    <tr${prepaymentOccurred ? ' class="prepayment-row"' : ''}>
+                        <td>${monthYear}</td>
+                        <td>${monthlyPrincipalPayment.toFixed(2)}</td>
+                        <td>${interestForMonth.toFixed(2)}</td>
+                        <td>${prepaymentForMonth > 0 ? prepaymentForMonth.toFixed(2) : ''}</td>
+                        <td>${totalPayment.toFixed(2)}</td>
+                        <td>${balance.toFixed(2)}</td>
+                    </tr>
+                `;
+
+                yearWiseData[currentYear].push(monthRow);
+
+                monthCounter++;
+                remainingPeriods--;
+                currentMonth++;
+                if (currentMonth > 12) {
+                    currentMonth = 1;
+                    currentYear++;
+                }
+
+                // Save loan payoff date
+                if (balance <= 0 && !loanPayoffDate) {
+                    loanPayoffDate = `${String(currentMonth).padStart(2, '0')}/${currentYear}`;
+                }
+
+                // Add the year summary row at the end of the year or if loan is paid off
+                if (currentMonth === 1 || balance <= 0) {
+                    const yearTotalPayment = yearPrincipalPaid + yearInterestPaid + yearPrepaymentTotal;
+
+                    const displayYear = currentMonth === 1 ? currentYear - 1 : currentYear;
+
+                    amortizationData += `
+                        <tr class="toggle-year" data-year="${displayYear}">
+                            <td>${displayYear}</td>
+                            <td>${yearPrincipalPaid.toFixed(2)}</td>
+                            <td>${yearInterestPaid.toFixed(2)}</td>
+                            <td>${yearPrepaymentTotal.toFixed(2)}</td>
+                            <td>${yearTotalPayment.toFixed(2)}</td>
+                            <td>${balance.toFixed(2)}</td>
+                            <td><span class="arrow arrow-up" id="arrow-${displayYear}">▶</span></td>
+                        </tr>
+                        <tr class="collapse" id="year-${displayYear}">
+                            <td colspan="7">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>${languageData[lang]['month']}</th>
+                                            <th>${languageData[lang]['principal']}</th>
+                                            <th>${languageData[lang]['interest']}</th>
+                                            <th>${languageData[lang]['prepayment']}</th>
+                                            <th>${languageData[lang]['totalPayment']}</th>
+                                            <th>${languageData[lang]['balance']}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="monthDetails-${displayYear}">
+                                        ${yearWiseData[displayYear].join('')}
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>`;
+
+                    yearPrincipalPaid = 0;
+                    yearInterestPaid = 0;
+                    yearPrepaymentTotal = 0;
+                }
+            }
+
+            amortizationData += '</tbody></table>';
+            document.getElementById('amortizationSchedule').innerHTML = amortizationData;
+
+            // Display Summary
+            displaySummary(totalInterestPaid, totalPayments, loanPayoffDate, lang);
+
+            // Attach event listeners for collapsible rows
+            attachToggleEvents();
+        }
+
+        function displaySummary(totalInterestPaid, totalPayments, loanPayoffDate, lang) {
+            document.getElementById('totalInterestPaid').textContent = `€${totalInterestPaid.toFixed(2)}`;
+            document.getElementById('totalPayments').textContent = `€${totalPayments.toFixed(2)}`;
+            document.getElementById('loanPayoffDate').textContent = loanPayoffDate || '--/----';
+
+            document.getElementById('summarySection').style.display = 'block';
+        }
+
+        function attachToggleEvents() {
+            const toggleRows = document.querySelectorAll('.toggle-year');
+            toggleRows.forEach(row => {
+                row.addEventListener('click', function () {
+                    const year = this.getAttribute('data-year');
+                    const collapseRow = document.getElementById(`year-${year}`);
+                    collapseRow.classList.toggle('collapse');
+                    const arrow = document.getElementById(`arrow-${year}`);
+                    arrow.classList.toggle('arrow-up');
+                    arrow.classList.toggle('arrow-down');
+                });
+            });
+        }
+
+        // Update calculations when mortgage type changes
+        document.querySelectorAll('input[name="mortgageType"]').forEach(radio => {
+            radio.addEventListener('change', function () {
+                if (validateInputs()) {
+                    calculateEMI();
+                }
+            });
+        });
+    </script>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- FontAwesome -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</body>
+</html>
