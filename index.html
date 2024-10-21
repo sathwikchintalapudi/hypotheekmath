@@ -87,6 +87,30 @@
             margin-top: 40px;
             margin-bottom: 20px;
         }
+          /* GitHub Button */
+        .github-button {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background-color: #24292e; /* GitHub's official color */
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .github-button:hover {
+            background-color: #444d56;
+            transform: translateY(-2px);
+        }
+        .github-button:active {
+            background-color: #1b1f23;
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body>
@@ -811,6 +835,9 @@
             });
         });
     </script>
+    <a href="https://github.com/sathwikchintalapudi/hypotheekmath" target="_blank" title="Enhance your experience by contributing a PR!">
+        <button class="github-button">GitHub</button>
+    </a>
 
     <!-- Bootstrap JS and dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
